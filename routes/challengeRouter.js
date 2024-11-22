@@ -5,17 +5,16 @@ const router = express.Router();
 const db = require("../config/mysql");
 const conn = db.init();
 
-router.get("/", (req, res) => {
-  res.json({ message: "Challenge Router" });
-});
-
 // 신청 가능한 챌린지 목록 조회
 router.get("/all-challenges", (req, res) => {
+  // #swagger.tags = ['챌린지 API']
   res.send(challenges);
 });
 
 // 특정 챌린지 선택하여 챌린지 진행하기
 router.post("/create-challenge", (req, res) => {
+  // #swagger.tags = ['챌린지 API']
+
   const { userId, challengeId } = req.body;
   const chal_info = challenges.filter((item) => item.id === challengeId)[0];
 
@@ -24,8 +23,9 @@ router.post("/create-challenge", (req, res) => {
   const st_dt = now_dt.format("YYYY-MM-DD");
   const ed_dt = now_dt.add(chal_info.period, "day").format("YYYY-MM-DD");
 
-  const sql = "insert into tb_challenge (chal_type, user_id, chal_title, chal_st_dt, chal_ed_dt) values (?,?,?,?,?)";
-  const data = [chal_info.id, userId, chal_info.name, st_dt, ed_dt];
+  const sql =
+    "insert into tb_challenge (chal_type, user_id, chal_title, chal_st_dt, chal_ed_dt, chal_desc, chal_point) values (?,?,?,?,?,?,?)";
+  const data = [chal_info.type, userId, chal_info.name, st_dt, ed_dt, chal_info.description, chal_info.point];
   conn.query(sql, data, (err, result) => {
     if (err) {
       console.log(err);
@@ -37,9 +37,12 @@ router.post("/create-challenge", (req, res) => {
 
 // 내 챌린지 목록
 router.get("/my-challenges", (req, res) => {
+  // #swagger.tags = ['챌린지 API']
+
   const userId = req.body.userId;
 
-  const sql = "select chal_idx, chal_title, chal_st_dt, chal_ed_dt from tb_challenge where user_id = ?";
+  const sql =
+    "select chal_idx, chal_title, chal_desc, chal_point, chal_st_dt, chal_ed_dt from tb_challenge where user_id = ?";
   const data = [userId];
   conn.query(sql, data, (err, result) => {
     if (err) {

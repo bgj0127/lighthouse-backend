@@ -6,11 +6,8 @@ const conn = db.init();
 
 dotenv.config();
 
-router.get("/", (req, res) => {
-  res.send({ message: "Ranking router" });
-});
-
 router.get("/best-users", (req, res) => {
+  // #swagger.tags = ['랭킹 API']
   const sql = "select user_name, user_point from tb_user order by user_point desc limit 10";
   conn.query(sql, (err, result) => {
     if (err) {

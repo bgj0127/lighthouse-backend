@@ -26,6 +26,8 @@
     "multer-s3": "^2.10.0",
     "mysql2": "^3.11.4",
     "nodemon": "^3.1.7",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1"
   }
 }

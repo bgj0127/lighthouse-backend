@@ -1,0 +1,346 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "E-Room API Document",
+    "description": "해당 문서를 통해 어떤 데이터를 요청해야하는지, 어떤 데이터가 응답되는지 확인할 수 있습니다.",
+    "version": "1.0.0"
+  },
+  "host": "http://localhost:3080",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          }
+        }
+      }
+    },
+    "/sign/login": {
+      "post": {
+        "tags": [
+          "유저 로그인/회원가입 API"
+        ],
+        "description": "로그인",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "userPw": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    },
+    "/sign/join": {
+      "post": {
+        "tags": [
+          "유저 로그인/회원가입 API"
+        ],
+        "description": "회원가입",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "userPw": {
+                  "example": "any"
+                },
+                "userName": {
+                  "example": "any"
+                },
+                "userBirthdate": {
+                  "example": "any"
+                },
+                "userEmail": {
+                  "example": "any"
+                },
+                "userPhone": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "잘못된 요청"
+          }
+        }
+      }
+    },
+    "/sign/checkid": {
+      "get": {
+        "tags": [
+          "유저 로그인/회원가입 API"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "409": {
+            "description": "충돌"
+          },
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    },
+    "/sign/id-phone": {
+      "get": {
+        "tags": [
+          "유저 로그인/회원가입 API"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "잘못된 요청"
+          },
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    },
+    "/sign/change-password": {
+      "post": {
+        "tags": [
+          "유저 로그인/회원가입 API"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "userPw": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    },
+    "/schedule/list": {
+      "get": {
+        "tags": [
+          "일정조회 API"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    },
+    "/exam/recommended-exams": {
+      "get": {
+        "tags": [
+          "기출문제 API"
+        ],
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/exam/result": {
+      "get": {
+        "tags": [
+          "기출문제 API"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          }
+        }
+      }
+    },
+    "/point/point-amount": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          }
+        }
+      }
+    },
+    "/point/top-users": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          }
+        }
+      }
+    },
+    "/challenge/all-challenges": {
+      "get": {
+        "tags": [
+          "챌린지 API"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          }
+        }
+      }
+    },
+    "/challenge/create-challenge": {
+      "post": {
+        "tags": [
+          "챌린지 API"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "challengeId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    },
+    "/challenge/my-challenges": {
+      "get": {
+        "tags": [
+          "챌린지 API"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    },
+    "/profile/user-profile": {
+      "get": {
+        "tags": [
+          "유저 프로필 API"
+        ],
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "500": {
+            "description": "내부 서버 오류"
+          }
+        }
+      }
+    },
+    "/profile/upload-image": {
+      "post": {
+        "tags": [
+          "유저 프로필 API"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "",
+            "in": "query",
+            "description": "프로필 이미지 업로드는 반드시 ?directory=profile",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "image": "file",
+                "userId": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

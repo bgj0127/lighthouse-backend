@@ -5,11 +5,8 @@ const axios = require("axios");
 const db = require("../config/mysql");
 const conn = db.init();
 
-router.get("/", (req, res) => {
-  res.json({ message: "Score Router" });
-});
-
 router.get("/recommended-exams", async (req, res) => {
+  // #swagger.tags = ['기출문제 API']
   const { license, section, keyword } = req.body;
 
   await axios
@@ -27,6 +24,7 @@ router.get("/recommended-exams", async (req, res) => {
 
 // 문제풀이 후 결과(점수, 포인트)
 router.get("/result", (req, res) => {
+  // #swagger.tags = ['기출문제 API']
   res.json({ score: 100, point: 73 });
 });
 

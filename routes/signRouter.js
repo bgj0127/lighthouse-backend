@@ -6,11 +6,9 @@ const conn = db.init();
 const dotenv = require("dotenv");
 dotenv.config();
 
-router.get("/", (req, res) => {
-  res.json({ message: "Sign Router" });
-});
-
 router.post("/login", (req, res) => {
+  // #swagger.description = '로그인'
+  // #swagger.tags = ['유저 로그인/회원가입 API']
   const { userId, userPw } = req.body;
   const sql = "select user_name from tb_user where user_id = ? and user_pw = sha2(?,256)";
   conn.query(sql, [userId, userPw], (err, result) => {
@@ -19,14 +17,18 @@ router.post("/login", (req, res) => {
       res.status(500).send({ message: "server error" });
     }
     if (result.length <= 0) {
+      console.log(`로그인 실패:${userId} / ${userPw}`);
       res.status(400).send({ message: "아이디 혹은 비밀번호가 잘못되었습니다." });
     } else {
+      console.log(`로그인 성공:${userId} / ${userPw}`);
       res.status(200).send(result[0].user_name);
     }
   });
 });
 
 router.post("/join", (req, res) => {
+  // #swagger.description = '회원가입'
+  // #swagger.tags = ['유저 로그인/회원가입 API']
   const { userId, userPw, userName, userBirthdate, userEmail, userPhone } = req.body;
   const sql =
     "insert into tb_user (user_id, user_pw, user_name, user_birthdate, user_email, user_phone, user_point, user_image) values (?,sha2(?,256),?,?,?,?,?,?)";
@@ -45,11 +47,13 @@ router.post("/join", (req, res) => {
       console.log("query is not excuted: " + err);
       res.status(400).send({ code: 400, message: "회원가입 실패" });
     }
+    console.log("회원가입 성공 - 200");
     res.status(200).send({ code: 200, message: "회원가입 완료" });
   });
 });
 
 router.get("/checkid", (req, res) => {
+  // #swagger.tags = ['유저 로그인/회원가입 API']
   const userId = req.body.userId;
   const sql = "select user_id from tb_user where user_id = ?";
   conn.query(sql, [userId], (err, result) => {
@@ -66,6 +70,7 @@ router.get("/checkid", (req, res) => {
 });
 
 router.get("/id-phone", (req, res) => {
+  // #swagger.tags = ['유저 로그인/회원가입 API']
   const { userId, userPhone } = req.body;
   const sql = "select user_id from tb_user where user_id = ? and user_phone = ?";
   const data = [userId, userPhone];
@@ -83,6 +88,7 @@ router.get("/id-phone", (req, res) => {
 });
 
 router.post("/change-password", (req, res) => {
+  // #swagger.tags = ['유저 로그인/회원가입 API']
   const { userId, userPw } = req.body;
   const sql = "update tb_user set user_pw=sha2(?,256) where user_id = ?";
   const data = [userPw, userId];
