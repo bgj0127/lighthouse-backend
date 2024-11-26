@@ -11,6 +11,26 @@ router.get("/all-challenges", (req, res) => {
   res.send(challenges);
 });
 
+router.use("/create-challenge", (req, res, next) => {
+  const { userId, challengeId } = req.body;
+  const chal_info = challenges.filter((item) => item.id === challengeId)[0];
+
+  const title = chal_info.name;
+
+  const verifySql = `select * from tb_challenge where is_succeed is null and chal_title = ? and user_id = ?`;
+  const verifyData = [title, userId];
+  conn.query(verifySql, verifyData, (err, result) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send({ message: "server error" });
+    } else if (result.length > 0) {
+      res.status(409).send({ message: "이미 진행중인 챌린지 입니다." });
+    } else {
+      next();
+    }
+  });
+});
+
 // 특정 챌린지 선택하여 챌린지 진행하기
 router.post("/create-challenge", (req, res) => {
   // #swagger.tags = ['챌린지 API']
@@ -30,16 +50,15 @@ router.post("/create-challenge", (req, res) => {
     if (err) {
       console.log(err);
       res.status(500).send({ message: "server error" });
-    }
-    res.status(200).send({ message: "챌린지 생성" });
+    } else res.status(200).send({ message: "챌린지 생성" });
   });
 });
 
 // 내 챌린지 목록
-router.get("/my-challenges", (req, res) => {
+router.get("/my-challenges/:userId", (req, res) => {
   // #swagger.tags = ['챌린지 API']
 
-  const userId = req.body.userId;
+  const userId = req.params.userId;
 
   const sql =
     "select chal_idx, chal_title, chal_desc, chal_point, chal_st_dt, chal_ed_dt from tb_challenge where user_id = ?";
@@ -48,8 +67,7 @@ router.get("/my-challenges", (req, res) => {
     if (err) {
       console.log(err);
       res.status(500).send({ message: "server error" });
-    }
-    res.status(200).send(result);
+    } else res.status(200).send(result);
   });
 });
 

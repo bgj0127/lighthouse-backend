@@ -30,6 +30,7 @@ router.post("/join", (req, res) => {
   // #swagger.description = '회원가입'
   // #swagger.tags = ['유저 로그인/회원가입 API']
   const { userId, userPw, userName, userBirthdate, userEmail, userPhone } = req.body;
+  console.log(req.body);
   const sql =
     "insert into tb_user (user_id, user_pw, user_name, user_birthdate, user_email, user_phone, user_point, user_image) values (?,sha2(?,256),?,?,?,?,?,?)";
   const data = [
@@ -46,6 +47,7 @@ router.post("/join", (req, res) => {
     if (err) {
       console.log("query is not excuted: " + err);
       res.status(400).send({ code: 400, message: "회원가입 실패" });
+      return;
     }
     console.log("회원가입 성공 - 200");
     res.status(200).send({ code: 200, message: "회원가입 완료" });

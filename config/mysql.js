@@ -1,11 +1,14 @@
 const mysql = require("mysql2");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const db_info = {
-  host: "localhost",
-  port: "3306",
-  user: "lh_user",
-  password: "1234",
-  database: "lh_db",
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: "campus_24IS_IOT_p3_3",
 };
 
 module.exports = {

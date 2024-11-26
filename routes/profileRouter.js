@@ -8,9 +8,9 @@ const conn = db.init();
 
 dotenv.config();
 
-router.get("/user-profile", (req, res) => {
+router.get("/user-profile/:userId", (req, res) => {
   // #swagger.tags = ['유저 프로필 API']
-  const userId = req.body.userId;
+  const userId = req.params.userId;
   const sql = "select user_name, user_image, user_point from tb_user where user_id = ?";
   conn.query(sql, [userId], (err, result) => {
     if (err) {
@@ -42,6 +42,19 @@ router.post("/upload-image", imageUplaoder.single("image"), (req, res) => {
     }
   }
    */
+  res.setHeader("Content-Type", "multipart/form-data");
+  const userId = req.body.userId;
+  console.log(userId);
+  console.log("이미지 업로드");
+  const sql = "update tb_user set user_image=? where user_id = ?";
+  const data = [`https://lighthouse-project-storage.s3.ap-northeast-2.amazonaws.com/profile/${userId}.png`, userId];
+  conn.query(sql, data, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(result);
+    }
+  });
   res.send({ message: "success" });
 });
 
