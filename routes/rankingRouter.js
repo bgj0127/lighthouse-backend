@@ -6,9 +6,10 @@ const conn = db.init();
 
 dotenv.config();
 
-router.get("/best-users", (req, res) => {
+router.get("/best-point", (req, res) => {
   // #swagger.tags = ['랭킹 API']
-  const sql = "select user_name, user_point from tb_user order by user_point desc limit 10";
+  const sql = "select user_id, user_name, user_point, user_image from tb_user order by user_point desc limit 10";
+
   conn.query(sql, (err, result) => {
     if (err) {
       console.log(err);

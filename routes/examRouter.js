@@ -38,6 +38,11 @@ router.post("/solving", (req, res) => {
 
   if (userAnswer == correctEx) {
     correctAnswer = "Y";
+  } else {
+    const createReviewNote = "insert into tb_review_note (user_id, ex_idx, ex_license) values (?,?,'빅데이터분석기사')";
+    conn.query(createReviewNote, [userId, exIdx], (err, result) => {
+      console.log(result);
+    });
   }
 
   const sql = "insert into tb_solving (user_answer, user_id, ex_idx, correct_yn) values (?,?,?,?)";
@@ -52,10 +57,34 @@ router.post("/solving", (req, res) => {
   });
 });
 
-// 문제풀이 후 결과(점수, 포인트)
-router.get("/result", (req, res) => {
+// 문제풀이 후 결과(문제결과, 포인트)
+router.post("/result", (req, res) => {
+  const userId = req.body.userId;
   // #swagger.tags = ['기출문제 API']
-  res.json({ score: 100, point: 73 });
+  const sql = "select * from tb_solving where user_id = ? order by solving_idx limit 10";
+  conn.query(sql, [userId], (err, result) => {
+    if (err) {
+      res.status(500).end();
+    } else {
+      let correct = 0;
+      for (let i = 0; i < result.length; i++) {
+        if (result[i]["correct_yn"] == "Y") {
+          correct += 1;
+        }
+      }
+      const add_point = "update tb_user set user_point = tb_user.user_point + ? where user_id = ?";
+      conn.query(add_point, [correct * 3, userId], (err, _) => {
+        if (err) {
+          console.log(err);
+          res.status(500).end();
+        } else {
+          console.log("포인트 지급 완료");
+          res.send({ exams: result, point: correct * 3 });
+        }
+      });
+      console.log(correct);
+    }
+  });
 });
 
 module.exports = router;

@@ -13,6 +13,8 @@ const examRouter = require("./routes/examRouter");
 const pointRouter = require("./routes/pointRouter");
 const challengeRouter = require("./routes/challengeRouter");
 const profileRouter = require("./routes/profileRouter");
+const reviewRouter = require("./routes/reviewRouter");
+const rankingRouter = require("./routes/rankingRouter");
 
 app.use(cors({ origin: "*" }));
 app.use(express.urlencoded({ extended: true }));
@@ -24,6 +26,8 @@ app.use("/exam", examRouter);
 app.use("/point", pointRouter);
 app.use("/challenge", challengeRouter);
 app.use("/profile", profileRouter);
+app.use("/review", reviewRouter);
+app.use("/ranking", rankingRouter);
 
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerFile, { explorer: true }));
 
