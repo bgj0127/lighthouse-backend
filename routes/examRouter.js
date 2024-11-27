@@ -9,6 +9,27 @@ const conn = db.init();
 
 dotenv.config();
 
+router.get("/first-exam", (req, res) => {
+  const section_1_sql = "select * from tb_exam where ex_section = '1' limit 10; ";
+  const section_2_sql = "select * from tb_exam where ex_section = '2' limit 10; ";
+  const section_3_sql = "select * from tb_exam where ex_section = '3' limit 10; ";
+  const section_4_sql = "select * from tb_exam where ex_section = '4' limit 10 ";
+
+  conn.query(section_1_sql + section_2_sql + section_3_sql + section_4_sql, (err, result) => {
+    if (err) {
+      console.log(err);
+      res.status(500).end();
+    } else {
+      const sec1 = result[0];
+      const sec2 = result[1];
+      const sec3 = result[2];
+      const sec4 = result[3];
+      console.log(sec1, sec2, sec3, sec4);
+      res.send({ data: [sec1, sec2, sec3, sec4] });
+    }
+  });
+});
+
 router.get("/recommended-exams", async (req, res) => {
   // #swagger.tags = ['기출문제 API']
 

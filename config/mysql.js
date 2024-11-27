@@ -9,6 +9,7 @@ const db_info = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: "campus_24IS_IOT_p3_3",
+  multipleStatements: true,
 };
 
 module.exports = {
