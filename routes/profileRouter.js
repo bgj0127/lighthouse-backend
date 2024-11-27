@@ -1,4 +1,5 @@
 const express = require("express");
+const moment = require("moment");
 const imageUplaoder = require("../config/imageUploader");
 const dotenv = require("dotenv");
 const router = express.Router();
@@ -7,6 +8,38 @@ const db = require("../config/mysql");
 const conn = db.init();
 
 dotenv.config();
+
+router.get("/study-info", (req, res) => {
+  const userId = req.query.userId;
+
+  const sql = "select * from tb_study_time where user_id = ? and study_st_dt >= date_sub(curdate(), interval 4 day)";
+  conn.query(sql, [userId], (err, result) => {
+    if (err) {
+      console.log(err);
+      res.status(500).end();
+    } else {
+      const realTimeList = Object.values(
+        result.reduce((acc, curr) => {
+          const date = new Date(curr.study_st_dt).toISOString().split("T")[0];
+
+          const startTime = new Date(curr.study_st_dt);
+          const endTime = new Date(curr.study_ed_dt);
+
+          const timeDifferenceInMinutes = Math.floor((endTime - startTime) / 1000 / 60);
+
+          if (!acc[date]) {
+            acc[date] = { date, real_study_time: 0, total_study_time: 0 };
+          }
+          acc[date].real_study_time += parseInt(curr.study_time, 10);
+          acc[date].total_study_time += timeDifferenceInMinutes;
+
+          return acc;
+        }, {})
+      );
+      res.send(realTimeList);
+    }
+  });
+});
 
 router.get("/user-profile/:userId", (req, res) => {
   // #swagger.tags = ['유저 프로필 API']

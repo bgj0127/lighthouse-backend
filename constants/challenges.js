@@ -8,6 +8,14 @@ const challenges = [
     point: "200",
   },
   {
+    id: 81,
+    name: "빅데이터분석기사 1과목",
+    description: "10문제",
+    type: "time",
+    period: 30,
+    point: 100,
+  },
+  {
     id: 1,
     name: "포인트 복사 버그",
     description: "기간 내에 포인트 모으기",

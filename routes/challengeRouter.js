@@ -11,11 +11,13 @@ router.get("/all-challenges", (req, res) => {
   res.send(challenges);
 });
 
-router.use("/create-challenge", (req, res, next) => {
+router.use("/select-challenge", (req, res, next) => {
   const { userId, challengeId } = req.body;
   const chal_info = challenges.filter((item) => item.id === challengeId)[0];
 
   const title = chal_info.name;
+
+  const now_dt = moment();
 
   const verifySql = `select * from tb_challenge where is_succeed is null and chal_title = ? and user_id = ?`;
   const verifyData = [title, userId];
@@ -32,7 +34,7 @@ router.use("/create-challenge", (req, res, next) => {
 });
 
 // 특정 챌린지 선택하여 챌린지 진행하기
-router.post("/create-challenge", (req, res) => {
+router.post("/select-challenge", (req, res) => {
   // #swagger.tags = ['챌린지 API']
 
   const { userId, challengeId } = req.body;
@@ -40,8 +42,10 @@ router.post("/create-challenge", (req, res) => {
 
   const now_dt = moment();
 
-  const st_dt = now_dt.format("YYYY-MM-DD");
-  const ed_dt = now_dt.add(chal_info.period, "day").format("YYYY-MM-DD");
+  const st_dt = now_dt.format();
+  const ed_dt = now_dt.add(chal_info.period, "minute").format();
+
+  console.log(st_dt, ed_dt);
 
   const sql =
     "insert into tb_challenge (chal_type, user_id, chal_title, chal_st_dt, chal_ed_dt, chal_desc, chal_point) values (?,?,?,?,?,?,?)";

@@ -24,7 +24,7 @@ router.get("/first-exam", (req, res) => {
       const sec2 = result[1];
       const sec3 = result[2];
       const sec4 = result[3];
-      console.log(sec1, sec2, sec3, sec4);
+      console.log("배치고사 문제 전달");
       res.send({ data: [sec1, sec2, sec3, sec4] });
     }
   });
@@ -57,6 +57,7 @@ router.post("/solving", (req, res) => {
 
   let correctAnswer = "N";
 
+  console.log(userAnswer, correctEx);
   if (userAnswer == correctEx) {
     correctAnswer = "Y";
   } else {
@@ -70,10 +71,10 @@ router.post("/solving", (req, res) => {
   conn.query(sql, [userAnswer, userId, exIdx, correctAnswer], (err, result) => {
     if (err) {
       console.log(err);
-      res.end();
+      res.status(500).end();
     } else {
       console.log(result);
-      res.end();
+      res.status(200).end();
     }
   });
 });
