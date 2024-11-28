@@ -20,12 +20,9 @@ router.get("/first-exam", (req, res) => {
       console.log(err);
       res.status(500).end();
     } else {
-      const sec1 = result[0];
-      const sec2 = result[1];
-      const sec3 = result[2];
-      const sec4 = result[3];
+      const newArr = [...result[0], ...result[1], ...result[2], ...result[3]];
       console.log("배치고사 문제 전달");
-      res.send({ data: [sec1, sec2, sec3, sec4] });
+      res.send(newArr);
     }
   });
 });

@@ -22,7 +22,6 @@ router.post("/update-time", (req, res) => {
   console.log(st_dt, ed_dt);
 
   const realStudy = Math.floor((ed_dt.diff(st_dt, "minute") * 60 - restTimeSum) / 60);
-  console.log(realStudy);
   const sql = "insert into tb_study_time (user_id, study_st_dt, study_ed_dt, study_time) values (?,?,?,?)";
   conn.query(sql, [userId, st_dt.format(), ed_dt.format(), realStudy], (err, result) => {
     if (err) {
@@ -35,7 +34,5 @@ router.post("/update-time", (req, res) => {
   });
   res.send({ realStudy });
 });
-
-router.get("/time", (req, res) => {});
 
 module.exports = router;
