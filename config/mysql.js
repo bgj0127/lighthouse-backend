@@ -9,17 +9,11 @@ const db_info = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: "campus_24IS_IOT_p3_3",
-  multipleStatements: true,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 };
 
-module.exports = {
-  init: () => {
-    return mysql.createConnection(db_info);
-  },
-  connect: (conn) => {
-    conn.connect((err) => {
-      if (err) console.error("mysql connection error : " + err);
-      else console.log("mysql is connected successfully!");
-    });
-  },
-};
+const conn = mysql.createPool(db_info);
+
+module.exports = conn;

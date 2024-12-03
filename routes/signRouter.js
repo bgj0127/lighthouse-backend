@@ -1,7 +1,6 @@
 const express = require("express");
-const db = require("../config/mysql");
+const conn = require("../config/mysql");
 const router = express.Router();
-const conn = db.init();
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -10,7 +9,7 @@ router.post("/login", (req, res) => {
   // #swagger.description = '로그인'
   // #swagger.tags = ['유저 로그인/회원가입 API']
   const { userId, userPw } = req.body;
-  const sql = "select user_name from tb_user where user_id = ? and user_pw = sha2(?,256)";
+  const sql = "select user_name,user_id from tb_user where user_id = ? and user_pw = sha2(?,256)";
   conn.query(sql, [userId, userPw], (err, result) => {
     if (err) {
       console.log("query is not excuted: " + err);
@@ -21,7 +20,7 @@ router.post("/login", (req, res) => {
       res.status(400).send({ message: "아이디 혹은 비밀번호가 잘못되었습니다." });
     } else {
       console.log(`로그인 성공:${userId} / ${userPw}`);
-      res.status(200).send(result[0].user_name);
+      res.status(200).send({ userId: result[0].user_id, userName: result[0].user_name });
     }
   });
 });

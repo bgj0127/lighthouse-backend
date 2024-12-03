@@ -1,8 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const router = express.Router();
-const db = require("../config/mysql");
-const conn = db.init();
+const conn = require("../config/mysql");
 
 dotenv.config();
 
@@ -10,11 +9,22 @@ router.get("/reviews", (req, res) => {
   // #swagger.tags = ['오답노트 API']
   const userId = req.query.userId;
 
+  if (userId == undefined) {
+    console.log("GET /reviews - 400 BAD REQUEST", userId);
+    res.status(400).send({ message: "userId값을 넘겨주세요" });
+    return;
+  }
+
   const sql =
-    "select review_idx, review_text, is_reviewed, e.ex_license, ex_test, test_img, ex1, ex2, ex3, ex4, correct_ex from tb_review_note as r, tb_exam as e where r.ex_idx = e.ex_idx and user_id = ?";
+    "select review_idx, review_text, is_reviewed, e.ex_license, ex_test, test_img, ex1, ex2, ex3, ex4, r.user_answer, correct_ex from tb_review_note as r, tb_exam as e where r.ex_idx = e.ex_idx and user_id = ?";
   conn.query(sql, [userId], (err, result) => {
-    console.log(result);
-    res.send(result);
+    if (err) {
+      console.log("GET /reviews - 500 ERROR", err);
+      res.status(500).end();
+    } else {
+      console.log("GET /reviews - 200 OK", result.length);
+      res.send(result);
+    }
   });
 });
 
@@ -34,10 +44,10 @@ router.post("/memo", (req, res) => {
       const add_point = "update tb_user set user_point = tb_user.user_point + 5 where user_id = ?";
       conn.query(add_point, [userId], (err, result) => {
         if (err) {
-          console.log(err);
+          console.log("POST /memo - 500 ERROR", err);
           res.status(500).end();
         } else {
-          console.log("포인트 지급 완료");
+          console.log("POST /memo - 200 OK");
           res.end();
         }
       });

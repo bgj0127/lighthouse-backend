@@ -2,8 +2,7 @@ const express = require("express");
 const moment = require("moment");
 const challenges = require("../constants/challenges");
 const router = express.Router();
-const db = require("../config/mysql");
-const conn = db.init();
+const conn = require("../config/mysql");
 
 // 신청 가능한 챌린지 목록 조회
 router.get("/all-challenges", (req, res) => {
@@ -18,7 +17,6 @@ router.use("/select-challenge", (req, res, next) => {
   const title = chal_info.name;
 
   const now_dt = moment();
-
   const verifySql = `select * from tb_challenge where is_succeed is null and chal_title = ? and user_id = ?`;
   const verifyData = [title, userId];
   conn.query(verifySql, verifyData, (err, result) => {

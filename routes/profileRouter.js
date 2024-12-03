@@ -4,8 +4,7 @@ const imageUplaoder = require("../config/imageUploader");
 const dotenv = require("dotenv");
 const router = express.Router();
 
-const db = require("../config/mysql");
-const conn = db.init();
+const conn = require("../config/mysql");
 
 dotenv.config();
 
@@ -50,6 +49,7 @@ router.get("/user-profile/:userId", (req, res) => {
       console.log(err);
       res.status(500).send({ message: "server error" });
     }
+    console.log("GET /user-profile 200 OK", result[0]);
     res.send(result[0]);
   });
 });
