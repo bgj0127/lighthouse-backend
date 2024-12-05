@@ -56,7 +56,7 @@ router.get("/recommended-exams", async (req, res) => {
 
 router.post("/solving", (req, res) => {
   const { userId, userAnswer, exIdx, correctEx } = req.body;
-
+  console.log(userId);
   let correctAnswer = "N";
 
   console.log(userAnswer, correctEx);
@@ -86,7 +86,7 @@ router.post("/solving", (req, res) => {
 router.post("/result", (req, res) => {
   const userId = req.body.userId;
   // #swagger.tags = ['기출문제 API']
-  const sql = "select * from tb_solving where user_id = ? order by solving_idx limit 10";
+  const sql = "select * from tb_solving where user_id = ? order by solving_idx desc limit 10";
   conn.query(sql, [userId], (err, result) => {
     if (err) {
       console.log("POST /result - 500 ERROR", err.message);
@@ -104,8 +104,8 @@ router.post("/result", (req, res) => {
           console.log("POST /result - 500 ERROR", err.message);
           res.status(500).end();
         } else {
-          console.log("POST /result - 200 OK", userId);
-          res.send({ exams: result, point: correct * 3 });
+          console.log("POST /result - 200 OK", userId, correct);
+          res.send({ point: correct });
         }
       });
     }

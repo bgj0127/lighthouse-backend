@@ -10,8 +10,9 @@ const db_info = {
   password: process.env.DB_PASSWORD,
   database: "campus_24IS_IOT_p3_3",
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 20,
   queueLimit: 0,
+  multipleStatements: true,
 };
 
 const conn = mysql.createPool(db_info);

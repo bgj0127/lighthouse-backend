@@ -25,9 +25,7 @@ function getLocalIP() {
 // test용 axios
 const getExam = async (userId) => {
   const response = await axios
-    .get(`http://192.168.219.51:8000/test`, {
-      userId: userId,
-    })
+    .get(`http://192.168.219.43:8000/test?userId=${userId}`)
     .then((res) => {
       // console.log(res.data);
       return res.data;
@@ -40,31 +38,36 @@ const getExam = async (userId) => {
 
 // 반복수행하는 함수
 let task = cron.schedule(
-  "*/20 * * * * *",
+  "*/30 * * * * *",
   () => {
     let p = [];
+    let userId = "";
     for (let i = 0; i < 5; i++) {
       setTimeout(() => {
-        const t = moment().format();
-        getExam("hello")
+        getExam("dkwjd")
           .then((res) => {
-            p.push(res);
-            console.log("DATA : ", p);
+            console.log("res >>", res);
+            console.log("res[0] >> ", res[0]);
+            console.log("res[1] >> ", res[1]);
+            p.push(res["isStudy"]);
+            userId = res["userId"];
+            // 그냥 테스트용으로 만든 조건문
             if (
               p.length == 5 &&
               p.reduce((pre, cur) => {
                 return pre + cur;
-              }, 0) <= 3
+              }, 0) == 0
             ) {
-              console.log("SLEEP!!");
+              console.log("공부 안하고 있대요~");
+              axios.post("http://192.168.219.77:3080/study/update-time", { userId: userId });
             }
-            // console.log(t, p);
           })
           .catch((err) => {
             console.log(err.message);
           });
-      }, i * 3000);
+      }, i * 4000);
     }
+    console.log("hellll");
   },
   {
     scheduled: false,
@@ -111,30 +114,20 @@ router.post("/end-study", (req, res) => {
 
 router.post("/update-time", (req, res) => {
   // 유저아이디, 시작시간, 끝시간, 쉰 시간(초) 배열
-  const { userId, stTime, edTime } = req.body;
+  const { userId } = req.body;
 
-  const st_dt = moment(stTime, "YYYYMMDD HH:mm:ss");
-  const ed_dt = moment(edTime, "YYYYMMDD HH:mm:ss");
-  const restTimes = [1, 4, 73, 42, 10];
-
-  const restTimeSum = restTimes.reduce((acc, cur) => {
-    return acc + cur;
-  }, 0);
-
-  console.log(st_dt, ed_dt);
-
-  const realStudy = Math.floor((ed_dt.diff(st_dt, "minute") * 60 - restTimeSum) / 60);
-  const sql = "insert into tb_study_time (user_id, study_st_dt, study_ed_dt, study_time) values (?,?,?,?)";
-  conn.query(sql, [userId, st_dt.format(), ed_dt.format(), realStudy], (err, result) => {
+  // 20초마다 3초 간격으로 실행시켜서 전부 공부 안하고 있으면 15초 추가하는 쿼리문
+  const update_time =
+    "update tb_study_time join(select max(study_st_dt) as latest_start from tb_study_time where user_id = ?) as subquery on tb_study_time.study_st_dt = subquery.latest_start set tb_study_time.rest_sec = ifnull(tb_study_time.rest_sec,0) + 20";
+  conn.query(update_time, [userId], (err, result) => {
     if (err) {
-      console.log(err);
+      console.log("POST /update-time - 500 ERROR", err.message);
       res.status(500).end();
     } else {
-      console.log(result);
+      console.log("POST /update-time - 200 OK", `USER: ${userId}`, result.info);
       res.status(200).end();
     }
   });
-  res.send({ realStudy });
 });
 
 module.exports = router;
