@@ -21,8 +21,6 @@ function getLocalIP() {
   }
   return "IP 주소를 찾을 수 없습니다.";
 }
-
-// test용 axios
 const getExam = async (userId) => {
   const response = await axios
     .get(`http://192.168.219.43:8000/test?userId=${userId}`)
@@ -37,48 +35,48 @@ const getExam = async (userId) => {
 };
 
 // 반복수행하는 함수
-let task = cron.schedule(
-  "*/30 * * * * *",
-  () => {
-    let p = [];
-    let userId = "";
-    for (let i = 0; i < 5; i++) {
-      setTimeout(() => {
-        getExam("dkwjd")
-          .then((res) => {
-            console.log("res >>", res);
-            console.log("res[0] >> ", res[0]);
-            console.log("res[1] >> ", res[1]);
-            p.push(res["isStudy"]);
-            userId = res["userId"];
-            // 그냥 테스트용으로 만든 조건문
-            if (
-              p.length == 5 &&
-              p.reduce((pre, cur) => {
-                return pre + cur;
-              }, 0) == 0
-            ) {
-              console.log("공부 안하고 있대요~");
-              axios.post("http://192.168.219.77:3080/study/update-time", { userId: userId });
-            }
-          })
-          .catch((err) => {
-            console.log(err.message);
-          });
-      }, i * 4000);
-    }
-    console.log("hellll");
-  },
-  {
-    scheduled: false,
-  }
-);
+// let task = cron.schedule(
+//   "*/30 * * * * *",
+//   () => {
+//     let p = [];
+//     let userId = "";
+//     for (let i = 0; i < 5; i++) {
+//       setTimeout(() => {
+//         getExam("dkwjd")
+//           .then((res) => {
+//             console.log("res >>", res);
+//             console.log("res[0] >> ", res[0]);
+//             console.log("res[1] >> ", res[1]);
+//             p.push(res["isStudy"]);
+//             userId = res["userId"];
+//             // 그냥 테스트용으로 만든 조건문
+//             if (
+//               p.length == 5 &&
+//               p.reduce((pre, cur) => {
+//                 return pre + cur;
+//               }, 0) == 0
+//             ) {
+//               console.log("공부 안하고 있대요~");
+//               axios.post("http://192.168.219.77:3080/study/update-time", { userId: userId });
+//             }
+//           })
+//           .catch((err) => {
+//             console.log(err.message);
+//           });
+//       }, i * 4000);
+//     }
+//     console.log("hellll");
+//   },
+//   {
+//     scheduled: false,
+//   }
+// );
 
 router.post("/start-study", (req, res) => {
   const { userId } = req.body;
   const st_dt = moment().format();
 
-  task.start();
+  // task.start();
 
   const sql = "insert into tb_study_time (user_id, study_st_dt) values (?,?)";
   conn.query(sql, [userId, st_dt], (err, result) => {
@@ -92,11 +90,41 @@ router.post("/start-study", (req, res) => {
   });
 });
 
+router.post("/start-detect", async (req, res) => {
+  const { userId } = req.body;
+
+  let p = [];
+  let isP = 0;
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      getExam(userId)
+        .then((response) => {
+          console.log("res >>", response);
+          p.push(response["isStudy"]);
+          isP = p.reduce((pre, cur) => {
+            return pre + cur;
+          }, 0);
+          // 그냥 테스트용으로 만든 조건문
+          if (p.length == 5 && isP == 0) {
+            console.log("공부 안하고 있대요~");
+            axios.post("http://192.168.219.77:3080/study/update-time", { userId: userId });
+            res.status(200).end();
+          } else if (p.length == 5 && isP > 0) {
+            res.status(200).end();
+          }
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
+    }, i * 4000);
+  }
+});
+
 router.post("/end-study", (req, res) => {
   const { userId } = req.body;
   const ed_dt = moment().format();
 
-  task.stop();
+  // task.stop();
 
   const sql =
     "update tb_study_time join(select max(study_st_dt) as latest_start from tb_study_time where user_id = ?) as subquery on tb_study_time.study_st_dt = subquery.latest_start set study_ed_dt = ?";
