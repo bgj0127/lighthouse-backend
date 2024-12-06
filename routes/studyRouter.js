@@ -72,6 +72,24 @@ const getExam = async (userId) => {
 //   }
 // );
 
+router.get("/check-body", async (req, res) => {
+  try {
+    const response = await axios({
+      url: "http://192.168.219.43:8000/check",
+      method: "GET",
+      responseType: "stream",
+    });
+
+    res.setHeader("Content-Type", "image/jpeg");
+    response.data.pipe(res);
+    console.log("GET /check-body - 200 OK");
+  } catch (e) {
+    console.error("Error fetching image:", e.message);
+    console.log("GET /check-body - 500 ERROR");
+    res.status(500).json({ e: "Failed to fetch image" });
+  }
+});
+
 router.post("/start-study", (req, res) => {
   const { userId } = req.body;
   const st_dt = moment().format();
@@ -95,7 +113,7 @@ router.post("/start-detect", async (req, res) => {
 
   let p = [];
   let isP = 0;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     setTimeout(() => {
       getExam(userId)
         .then((response) => {
@@ -105,18 +123,18 @@ router.post("/start-detect", async (req, res) => {
             return pre + cur;
           }, 0);
           // 그냥 테스트용으로 만든 조건문
-          if (p.length == 5 && isP == 0) {
+          if (p.length == 4 && isP == 0) {
             console.log("공부 안하고 있대요~");
             axios.post("http://192.168.219.77:3080/study/update-time", { userId: userId });
             res.status(200).end();
-          } else if (p.length == 5 && isP > 0) {
+          } else if (p.length == 4 && isP > 0) {
             res.status(200).end();
           }
         })
         .catch((err) => {
           console.log(err.message);
         });
-    }, i * 4000);
+    }, i * 5000);
   }
 });
 
@@ -144,7 +162,6 @@ router.post("/update-time", (req, res) => {
   // 유저아이디, 시작시간, 끝시간, 쉰 시간(초) 배열
   const { userId } = req.body;
 
-  // 20초마다 3초 간격으로 실행시켜서 전부 공부 안하고 있으면 15초 추가하는 쿼리문
   const update_time =
     "update tb_study_time join(select max(study_st_dt) as latest_start from tb_study_time where user_id = ?) as subquery on tb_study_time.study_st_dt = subquery.latest_start set tb_study_time.rest_sec = ifnull(tb_study_time.rest_sec,0) + 20";
   conn.query(update_time, [userId], (err, result) => {

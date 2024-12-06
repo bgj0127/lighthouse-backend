@@ -128,6 +128,13 @@ router.post("/first-result", (req, res) => {
           correct += 1;
         }
       }
+      const set_first_false = "update tb_user set is_first = 'N' where user_id = ?";
+      conn.query(set_first_false, [userId], (err, _) => {
+        if (err) {
+          console.log("set_first_false ERROR : ", userId, err.message);
+        }
+      });
+
       const add_point = "update tb_user set user_point = tb_user.user_point + ? where user_id = ?";
       conn.query(add_point, [correct * 3, userId], (err, _) => {
         if (err) {
