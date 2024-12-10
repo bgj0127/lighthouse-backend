@@ -4,8 +4,9 @@ const dotenv = require("dotenv");
 const router = express.Router();
 const conn = require("../config/mysql");
 const os = require("os");
-const cron = require("node-cron");
 const { default: axios } = require("axios");
+
+const jetsonUrl = "http://192.168.219.43:8000";
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ function getLocalIP() {
 }
 const getExam = async (userId) => {
   const response = await axios
-    .get(`http://192.168.219.43:8000/test?userId=${userId}`)
+    .get(`${jetsonUrl}/test?userId=${userId}`)
     .then((res) => {
       // console.log(res.data);
       return res.data;
@@ -34,48 +35,10 @@ const getExam = async (userId) => {
   return response;
 };
 
-// 반복수행하는 함수
-// let task = cron.schedule(
-//   "*/30 * * * * *",
-//   () => {
-//     let p = [];
-//     let userId = "";
-//     for (let i = 0; i < 5; i++) {
-//       setTimeout(() => {
-//         getExam("dkwjd")
-//           .then((res) => {
-//             console.log("res >>", res);
-//             console.log("res[0] >> ", res[0]);
-//             console.log("res[1] >> ", res[1]);
-//             p.push(res["isStudy"]);
-//             userId = res["userId"];
-//             // 그냥 테스트용으로 만든 조건문
-//             if (
-//               p.length == 5 &&
-//               p.reduce((pre, cur) => {
-//                 return pre + cur;
-//               }, 0) == 0
-//             ) {
-//               console.log("공부 안하고 있대요~");
-//               axios.post("http://192.168.219.77:3080/study/update-time", { userId: userId });
-//             }
-//           })
-//           .catch((err) => {
-//             console.log(err.message);
-//           });
-//       }, i * 4000);
-//     }
-//     console.log("hellll");
-//   },
-//   {
-//     scheduled: false,
-//   }
-// );
-
 router.get("/check-body", async (req, res) => {
   try {
     const response = await axios({
-      url: "http://192.168.219.43:8000/check",
+      url: `${jetsonUrl}/check`,
       method: "GET",
       responseType: "stream",
     });
@@ -125,7 +88,7 @@ router.post("/start-detect", async (req, res) => {
           // 그냥 테스트용으로 만든 조건문
           if (p.length == 4 && isP == 0) {
             console.log("공부 안하고 있대요~");
-            axios.post("http://192.168.219.77:3080/study/update-time", { userId: userId });
+            axios.post("http://localhost:3080/study/update-time", { userId: userId });
             res.status(200).end();
           } else if (p.length == 4 && isP > 0) {
             res.status(200).end();

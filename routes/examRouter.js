@@ -33,7 +33,7 @@ router.get("/recommended-exams", async (req, res) => {
   console.log(req.query);
   const text = await translate(transText, { to: "en" });
   const exams = await axios
-    .get(`http://localhost:5678/webhook/load-exams?question=${text.text}&section=${req.query.section}`)
+    .get(`https://justmusic.app.n8n.cloud/webhook/load-exams?question=${text.text}&section=${req.query.section}`)
     .then((result) => {
       return result.data[0]["data"];
     });
@@ -85,6 +85,27 @@ router.post("/solving", (req, res) => {
 // 기출문제풀이 후 결과(문제결과, 포인트)
 router.post("/result", (req, res) => {
   const userId = req.body.userId;
+  function calculateTime(startDate, endDate, restSec) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // 두 날짜의 차이를 초 단위로 계산
+    const recordingTimeSec = Math.floor((end - start) / 1000);
+    const studyTimeSec = recordingTimeSec - restSec;
+
+    // 초 단위를 "N시간 N분" 형식으로 변환하는 함수
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600); // 시간 계산
+      const minutes = Math.floor((seconds % 3600) / 60); // 분 계산
+      return `${hours}시간 ${minutes}분`;
+    }
+
+    return {
+      recordingTime: formatTime(recordingTimeSec),
+      studyTime: formatTime(studyTimeSec),
+    };
+  }
+  let resultTime = {};
   // #swagger.tags = ['기출문제 API']
   const sql = "select * from tb_solving where user_id = ? order by solving_idx desc limit 10";
   conn.query(sql, [userId], (err, result) => {
@@ -98,6 +119,16 @@ router.post("/result", (req, res) => {
           correct += 1;
         }
       }
+      const getTime =
+        "select * from tb_study_time where study_st_dt = (select max(study_st_dt) from tb_study_time where user_id = ?) and user_id = ?";
+      conn.query(getTime, [userId, userId], (err, timeRes) => {
+        if (err) {
+          console.log("POST /result - getTime 500 ERROR", err.message);
+        } else if (timeRes.length <= 0) {
+        } else {
+          resultTime = calculateTime(timeRes[0]["study_st_dt"], timeRes[0]["study_ed_dt"], timeRes[0]["rest_sec"]);
+        }
+      });
       const add_point = "update tb_user set user_point = tb_user.user_point + ? where user_id = ?";
       conn.query(add_point, [correct * 3, userId], (err, _) => {
         if (err) {
@@ -105,7 +136,8 @@ router.post("/result", (req, res) => {
           res.status(500).end();
         } else {
           console.log("POST /result - 200 OK", userId, correct);
-          res.send({ point: correct });
+          resultTime["point"] = correct;
+          res.send(resultTime);
         }
       });
     }
